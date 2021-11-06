@@ -157,17 +157,17 @@ def isSolvable(board):
 
 h = [] 
 visited = set()
-n = 3
+n = 6
 board=[]
 #dùng bảng random
-# board = create_random_board(n)
-# while not isSolvable(board):
-#   board = create_random_board(n)
+board = create_random_board(n)
+while not isSolvable(board):
+  board = create_random_board(n)
 
 #dùng bảng cho sẵn trong file input để so sánh hiệu năng
-with open('input.txt') as file:
-  for line in file:
-    board.append([int(x) for x in line.split()])
+# with open('input.txt') as file:
+#   for line in file:
+#     board.append([int(x) for x in line.split()])
 
 
 print("Problem")
