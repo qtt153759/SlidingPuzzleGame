@@ -220,7 +220,7 @@ if FLAG == 'A_STAR':
 elif FLAG=="BFS":
   goal_states = finish_goal_states(n)
 elif FLAG == 'HUMAN':
-  goal_states = row_col_goal_states(n)#chỉ có HUMAN là dùng row_col vs in_order
+  goal_states = in_order_goal_states(n)#chỉ có HUMAN là dùng row_col vs in_order
   #goal_states = in_order_goal_states(n)#có thể dùng option in_order
 
 for liststate in goal_states:#in ra thử các đích
