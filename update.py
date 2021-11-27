@@ -210,18 +210,18 @@ def isSolvable(board):
 
 h = []
 visited = set()
-n = 5
+n = 10
 # f=g+h
 board = []
 # dùng bảng random
-board = create_random_board(n)
-while not isSolvable(board):
-    board = create_random_board(n)
+# board = create_random_board(n)
+# while not isSolvable(board):
+#     board = create_random_board(n)
 
 # #dùng bảng cho sẵn trong file input để so sánh hiệu năng
-# with open('input.txt') as file:
-#   for line in file:
-#     board.append([int(x) for x in line.split()])
+with open('input.txt') as file:
+  for line in file:
+    board.append([int(x) for x in line.split()])
 
 
 print("Problem")
@@ -356,7 +356,7 @@ if(FLAG == 'HUMAN'):  # Cách giải human
     f.write(to_string(root.board))
     f.write('\n')
     # chọn scale=3 vì 3*h(x)+g(x) sẽ giải nhanh hơn h(x)+g(x) như bình thường (ưu tiên heuristic)
-    h_scale_factor = 5
+    h_scale_factor = 7
     # push phần tử đầu tiên vào hàng đợi ưu tiên
     pq.heappush(h, (root.depth + h_scale_factor * root.heuristic, root))
     node = pq.heappop(h)[1]
@@ -536,7 +536,7 @@ if(FLAG == 'HUMAN'):  # Cách giải human
             visited = set()  # xóa visited
             # pq.heappush(h,h_scale_factor * manhattan(node.board, goal_states[curr_goal]), node)
 
-        children = node.generate_children()  # generate ra các nút con
+        children = node.generate_children_non_heuristic()  # generate ra các nút con
 
         for child in children:
             t = to_tuple(child.board)
