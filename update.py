@@ -4,15 +4,16 @@ import argparse  # De viet lenh tren terminal
 import time  # Tinh gio
 import heapq as pq  # hang doi uu tien
 # ( dùng heap nhanh hơn dùng queue piority vì mỗi lần push phần tử mới vào thì tốc độ chọn vị trí trong hàng đợi sẽ tốt hơn)
-
+check=0
 start = time.time()  # bat dau tinh gio
 FLAG = 'HUMAN'  # mac dinh chay se la human
 parser = argparse.ArgumentParser(
     description="Algorithm option")  # dung trong terminal
 parser.add_argument("--astar", help="perform A* search", action="store_true")
 parser.add_argument("--bfs", help="perform BFS search", action="store_true")
-parser.add_argument(
-    "--human", help="perform Human+A* search", action="store_true")
+parser.add_argument( "--human", help="perform Human+A* search", action="store_true")
+parser.add_argument( "--dfs", help="perform dfs search", action="store_true")
+parser.add_argument( "--ids", help="perform dfs search", action="store_true")
 args = parser.parse_args()  # dung trong terminal
 
 if args.astar:
@@ -21,6 +22,10 @@ elif args.bfs:
     FLAG = 'BFS'  # python update.py --bfs
 elif args.human:
     FALG = 'HUMAN'  # python update.py (mac dinh)
+elif args.dfs:
+    FLAG= 'DFS'
+elif args.ids:
+    FLAG = 'IDS'
 
 # node class
 
@@ -60,13 +65,13 @@ class Node:
 
     # phát sinh nút con của nút đang sét trường dùng bfs(heuristic=0)
     def generate_children_non_heuristic(self):
+        x,y=0,0
         for i in range(n):
             for j in range(n):
                 if self.board[i][j] == 0:
                     x, y = i, j
         # bfs thì đi hướng nào cx không có nhiều khác biệt như human
-        val_list = [[x+1, y, "DOWN"], [x, y-1, "LEFT"],
-                    [x, y+1, "RIGHT"], [x-1, y, "UP"]]
+        val_list = [[x+1, y, "DOWN"], [x, y-1, "LEFT"],[x, y+1, "RIGHT"], [x-1, y, "UP"]]
         children = []
         for child in val_list:
             if child[0] >= 0 and child[0] < n and child[1] >= 0 and child[1] < n:
@@ -210,18 +215,18 @@ def isSolvable(board):
 
 h = []
 visited = set()
-n = 10
+n = 5
 # f=g+h
 board = []
 # dùng bảng random
-# board = create_random_board(n)
-# while not isSolvable(board):
-#     board = create_random_board(n)
+board = create_random_board(n)
+while not isSolvable(board):
+    board = create_random_board(n)
 
 # #dùng bảng cho sẵn trong file input để so sánh hiệu năng
-with open('input.txt') as file:
-  for line in file:
-    board.append([int(x) for x in line.split()])
+# with open('input.txt') as file:
+#   for line in file:
+#     board.append([int(x) for x in line.split()])
 
 
 print("Problem")
@@ -291,7 +296,11 @@ elif FLAG == "BFS":
 elif FLAG == 'HUMAN':
     # chỉ có HUMAN là dùng row_col vs in_order
     goal_states = row_col_goal_states(n)
+elif FLAG=='DFS':
+    goal_states=finish_goal_states(n)
     # goal_states = in_order_goal_states(n)#có thể dùng option in_order
+elif FLAG == 'IDS':
+    goal_states = finish_goal_states(n)
 
 for liststate in goal_states:  # in ra thử các đích
     print(liststate)
@@ -302,7 +311,7 @@ curr_goal = 0  # bắt đầu trạng thái đích 0
 # khởi tạo node đề bài và tính heuristic
 root = Node(board, None, manhattan(board, goal_states[curr_goal]), 0, "Start")
 
-f = open("solution.txt", "w")
+f = open("solution1.txt", "w")
 f.truncate(0)
 
 
@@ -602,6 +611,64 @@ elif FLAG == 'A_STAR':  # giải bfs khác human là không cần vòng lặp wh
             pq.heappush(
                 h, (child.depth + h_scale_factor * child.heuristic, child))
 
+elif FLAG=='DFS':
+    h=[]
+    h.append(root)
+    while len(h) > 0:
+        count += 1
+        node = h.pop()
+        t = to_tuple(node.board)
+        visited.add(t)
+        if isGoal(node.board, goal_states[curr_goal]):
+            print("reached goal", curr_goal, goal_states[curr_goal])
+            plain_print(node.board)
+            # print()
+            h = []
+            # SAVE này khác human là nó chỉ có 1 bước nên không chuyền thành các tệp nhỏ đươc(chỉ 1 tệp lớn)
+            SAVE(node)
+            break
+
+        children = node.generate_children_non_heuristic()
+        for child in children:
+            t = to_tuple(child.board)
+            countChild = countChild + 1
+            if t in visited:
+                continue
+            countNode = countNode + 1
+            h.append(child)
+
+elif FLAG=='IDS':
+    limit=0
+    finish=False
+    while (not finish):
+        limit=limit+1
+        visited = set()
+        h=[]
+        h.append(root)
+        while len(h) > 0:
+            count += 1
+            node = h.pop()
+            t = to_tuple(node.board)
+            visited.add(t)#khi luu visited the nay neu co mot nut dang xet da visited thi no huy luon ca nhanh day =>ko giong bfs
+            if isGoal(node.board, goal_states[curr_goal]):
+                print("reached goal", curr_goal, goal_states[curr_goal])
+                plain_print(node.board)
+                # print()
+                h = []
+                # SAVE này khác human là nó chỉ có 1 bước nên không chuyền thành các tệp nhỏ đươc(chỉ 1 tệp lớn)
+                SAVE(node)
+                finish=True
+                break
+
+            if node.depth<=limit:
+                children = node.generate_children_non_heuristic()
+                for child in children:
+                    t = to_tuple(child.board)
+                    countChild = countChild + 1
+                    if t in visited:
+                        continue
+                    countNode = countNode + 1
+                    h.append(child)
 f.close()
 print("FLAG ", FLAG, " - Time ", time.time()-start, " - So step di ", step,
       "- So buoc duyet ", count, " - So node ", countNode, "- So generate child", countChild)
