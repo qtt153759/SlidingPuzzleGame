@@ -10,7 +10,7 @@ from nodeSlidingPuzzle.Node import Node
 start = time.time()  # bat dau tinh gio
 
 #Khỏi tạo n và tên thuật toán
-n = 15##khởi tạo giá trị cho n
+n = 5##khởi tạo giá trị cho n
 algorithms="HUMAN"# A_STAR,BFS,DFS,IDS
 
 ##Creat Board  2 tùy chọn  cách 1 là dùng file input
